@@ -3,6 +3,6 @@ class HelloController < ApplicationController
     @texto = "teste"
   end
   def index
-    render json: "teste"
+    render json: "teste1"
   end
 end

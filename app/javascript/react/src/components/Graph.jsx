@@ -1,10 +1,8 @@
 import React, {useEffect, useState} from 'react'
                                                         
-const Hello = (props) => {                                   
+const Graph = (props) => {                                   
   
-  let [count, setCount] = useState(2)
-  let [req, setReq] = useState("") 
-
+  let [count, setCount] = useState(0)
   useEffect(() => {
     fetch("/hello/worldGet").then(async res=>{
       const parse = await res.text()
@@ -12,11 +10,9 @@ const Hello = (props) => {
       return parse
     }).then(res=>setReq(res))
   }, [])
-  
   return (
     <div>
-      <h1>Counter prop:{props.name}: {count}</h1>
-      <h2>{req}</h2>
+      <h1>Counter prop:{props.trialID}: {count}</h1>
       <button onClick={()=>{
         setCount(count+1)
       }}> Add </button>
@@ -24,4 +20,4 @@ const Hello = (props) => {
   )                   
 }                                                       
                                         
-export default Hello
+export default Graph
