@@ -13,3 +13,270 @@
  *= require_tree .
  *= require_self
  */
+
+ul {
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+}
+
+.outer-container {
+	display: flex;
+	flex-direction: row;
+  flex-wrap: wrap;
+	border-radius: 10px; /* Cantos arredondados de 10px */
+	gap: 20px; /* Espaçamento entre os elementos */
+	padding: 20px; /* Espaçamento interno */
+}
+
+.container {
+  padding: 0 20px;
+  background-color: #f5f5f5;
+  min-width: 300px; /* Ajustar a largura conforme necessário */
+  border-radius: 8px; /* Cantos arredondados de 8px */
+}
+
+.container form {
+	display: flex;
+	flex-direction: column;
+	gap: 10px; /* Espaçamento entre os elementos */
+	width: fit-content; /* Ajustar a largura conforme necessário */
+	box-sizing: border-box; /* Incluir padding e border na largura e altura */
+}
+
+.outer-container h1, h2, h3, h4, h5, h6 {
+  font-family: "Roboto", sans-serif; /* Substitua pelo nome real da sua fonte */
+  font-size: 24px; /* Tamanho da fonte do título */
+  font-weight: bold; /* Negrito */
+  color: #333; /* Cor do texto */
+  margin-bottom: 20px; /* Espaçamento inferior para dar mais espaço */
+  letter-spacing: 2px; /* Espaçamento entre as letras */
+  line-height: 1.2; /* Altura da linha para melhor legibilidade */
+  /* Adiciona bordas arredondadas às letras */
+  border-radius: 10px; /* Valor de border-radius para ajustar a curvatura */
+  display: inline-block; /* Para que o border-radius seja aplicado corretamente */
+  background-color: #f0f0f0; /* Cor de fundo para cobrir os espaços vazios após arredondar */
+  padding: 5px 10px; /* Adiciona algum preenchimento para espaçamento interno */
+}
+
+.outer-container {
+  font-family: "Roboto", sans-serif; /* Substitua pelo nome real da sua fonte */
+  font-size: 15px; /* Tamanho da fonte do título */
+  color: #333; /* Cor do texto */
+  margin-bottom: 20px; /* Espaçamento inferior para dar mais espaço */
+  letter-spacing: 2px; /* Espaçamento entre as letras */
+  line-height: 1.2; /* Altura da linha para melhor legibilidade */
+}
+
+.container button {
+  width: fit-content;
+}
+
+.container form div {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.list-container {
+  border-radius: 8px;
+  padding: 0 20px;
+  background-color: #f5f5f5;
+	min-width: 300px; /* Ajustar a largura conforme necessário */
+	width: fit-content; /* Ajustar a largura conforme necessário */
+	box-sizing: border-box; /* Incluir padding e border na largura e altura */
+}
+
+.list-container li {
+  display:flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 5px; /* Espaçamento interno */
+  border-radius: 8px; /* Cantos arredondados de 8px */
+}
+
+.list-container li:nth-child(odd) {
+  background-color: lightgray; /* Set the background color for odd items */
+}
+
+.trial-container {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 0 20px;
+  min-width: 300px; /* Ajustar a largura conforme necessário */
+  border-radius: 8px; /* Cantos arredondados de 8px */
+  background-color: #f5f5f5;
+}
+
+.trail {
+  display:flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 5px; /* Espaçamento interno */
+  border-radius: 8px; /* Cantos arredondados de 8px */
+}
+
+.trial-container .trail:nth-child(odd) {
+  background-color: lightgray; /* Set the background color for odd items */
+}
+
+.trial-container .trail:nth-child(even) {
+  background-color: #f0f0f0; /* Set the background color for odd items */
+}
+
+.trial-container .trail:nth-child(even) .trail-row {
+  background-color: lightgray; /* Set the background color for odd items */
+}
+.trial-container .trail:nth-child(odd) .trail-row {
+  background-color: #f0f0f0; /* Set the background color for odd items */
+}
+
+.trail-row {
+  padding: 5px;
+}
+
+.trail-row > div {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+}
+
+.trail-row {
+  display:flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 8px; /* Cantos arredondados de 8px */
+  margin-bottom: 10px;
+}
+
+.factor-trail {
+  display:flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 8px; /* Cantos arredondados de 8px */
+  margin-bottom: 10px;
+  padding: 5px; /* Espaçamento interno */
+}
+
+.trail .factor-trail:nth-child(odd) {
+  background-color: #f0f0f0;; /* Set the background color for odd items */
+}
+
+.trail .factor-trail:nth-child(even) {
+  background-color: lightgray; /* Set the background color for odd items */
+}
+
+.label-title {
+	font-family: "Roboto", sans-serif; /* Substitua pelo nome real da sua fonte */
+	font-size: 24px; /* Tamanho da fonte do título */
+	font-weight: bold; /* Negrito */
+	color: #333; /* Cor do texto */
+	margin-bottom: 20px; /* Espaçamento inferior para dar mais espaço */
+	letter-spacing: 2px; /* Espaçamento entre as letras */
+	line-height: 1.2; /* Altura da linha para melhor legibilidade */
+	/* Adiciona bordas arredondadas às letras */
+	border-radius: 10px; /* Valor de border-radius para ajustar a curvatura */
+	display: inline-block; /* Para que o border-radius seja aplicado corretamente */
+	background-color: #f0f0f0; /* Cor de fundo para cobrir os espaços vazios após arredondar */
+	padding: 5px 10px; /* Adiciona algum preenchimento para espaçamento interno */
+}
+
+.label-menor {
+	font-family: "Roboto", sans-serif; /* Substitua pelo nome real da sua fonte */
+	font-size: 15px; /* Tamanho menor da fonte */
+	color: #333; /* Cor do texto para diferenciar */
+	margin-bottom: 13px; /* Espaçamento inferior menor */
+	letter-spacing: 0.5px; /* Espaçamento entre as letras */
+	line-height: 1.5; /* Altura da linha para melhor legibilidade */
+}
+
+.input-arredondado {
+	font-family: "Roboto", sans-serif; /* Substitua pelo nome real da sua fonte */
+	font-size: 10px; /* Tamanho da fonte do input */
+	padding: 10px; /* Espaçamento interno */
+	border: 1px solid #ddd; /* Cor da borda */
+	border-radius: 8px; /* Cantos arredondados */
+	outline: none; /* Remover a borda de foco padrão */
+	box-sizing: border-box; /* Incluir padding e border na largura e altura */
+	transition: border-color 0.3s ease; /* Adiciona uma transição suave para a cor da borda */
+}
+
+.input-arredondado:focus {
+	border-color: #3498db; /* Cor da borda quando em foco */
+}
+
+.botao-responsivo {
+	font-family: "Roboto", sans-serif;
+	font-size: 9px;
+	padding: 5px 10px;
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	transition: background-color 0.3s ease; /* Adiciona uma transição suave para a cor de fundo */
+
+	/* Adiciona estilos padrão */
+	background-color: #3498db;
+	color: #fff;
+}
+
+/* Efeito quando o mouse passa por cima */
+.botao-responsivo:hover {
+	background-color: #2980b9; /* Nova cor de fundo ao passar o mouse */
+}
+
+.botao-responsivo-secundario {
+	font-family: "Roboto", sans-serif;
+	font-size: 9px;
+	padding: 5px 10px;
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	transition: background-color 0.3s ease; /* Adiciona uma transição suave para a cor de fundo */
+
+	/* Adiciona estilos padrão */
+	background-color: #f0f0f0;
+	color: #333;
+}
+
+/* Efeito quando o mouse passa por cima */
+.botao-responsivo-secundario:hover {
+	background-color: #ddd; /* Nova cor de fundo ao passar o mouse */
+}
+
+/* DROPDOWN PARA SELECIONAR OS FATORES */
+.dropdown {
+	position: relative;
+	display: inline-block;
+}
+
+.dropdown-content {
+	display: none;
+	position: absolute;
+	background-color: #f1f1f1;
+	min-width: 160px;
+	box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+	z-index: 1;
+	border-radius: 8px;
+	padding: 5px;
+}
+
+.dropdown-content span {
+	color: black;
+	padding: 2px 10px;
+	text-decoration: none;
+	display: block;
+	cursor: pointer;
+	border-radius: 8px;
+}
+
+.dropdown-content span:hover {
+	background-color: #ddd;
+}
+
+.dropdown:hover .dropdown-content {
+	display: block;
+}
