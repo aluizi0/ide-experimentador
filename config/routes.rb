@@ -4,6 +4,11 @@ Rails.application.routes.draw do
   get 'hello/worldGet', to: "hello#index"
   get 'experiment/create', to: "experiment#index"
   post 'experiment/create', to: "experiment#create"
+  get 'experiment/classification', to: "classification#index"
+  get 'experiment/get_all', to: "experiment#get_all"
+  post 'tags/create', to: "tags#create"
+  get 'tags/get_all', to: "tags#get_all"
+  post 'experiment/add_tag', to: "experiment#add_tag"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.

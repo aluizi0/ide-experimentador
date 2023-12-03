@@ -67,4 +67,37 @@ class ExperimentController < ApplicationController
     render json: { experiments: experiments }, status: :ok
   end
 
+  def add_tag
+    # Check if params are valid
+    if params['experiment_id'].nil? || params['tag_id'].nil?
+      render json: { error: 'Invalid params' }, status: :unprocessable_entity
+      return
+    end
+
+    # Check if experiment exists
+    if Experiment.where(id: params['experiment_id']).empty?
+      render json: { error: 'Experiment not found' }, status: :not_found
+      return
+    end
+
+    # Check if tag exists
+    if Tag.where(id: params['tag_id']).empty?
+      render json: { error: 'Tag not found' }, status: :not_found
+      return
+    end
+
+    # Check if experiment already has tag
+    if ExperimentTag.where(experiment_id: params['experiment_id'], tag_id: params['tag_id']).any?
+      render json: { error: 'Experiment already has tag' }, status: :unprocessable_entity
+      return
+    end
+
+    # Add tag to experiment
+    experiment_tag = ExperimentTag.create(experiment_id: params['experiment_id'], tag_id: params['tag_id'])
+    render json: { message: 'success', experiment_tag: experiment_tag }, status: :ok
+
+    rescue StandardError => e
+      render json: { error: e.message }, status: :unprocessable_entity
+  end
+
 end
