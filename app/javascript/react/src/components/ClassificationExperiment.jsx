@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
+import AddTag from "./AddTag";
 
 const ClassificationExperiment = (props) => {
   const [experimentList, setExperimentList] = useState([]);
+  const [filteredExperiments, setFilteredExperiments] = useState([]); 
   const [searchText, setSearchText] = useState("");
 
   useEffect(() => {
@@ -12,17 +14,42 @@ const ClassificationExperiment = (props) => {
 
       if (response.ok) {
         setExperimentList(data.experiments);
+        return data.experiments
       } else {
         console.error("Error fetching experiments:", data.error);
       }
     };
 
-    fetchExperiments();
+    const result = fetchExperiments();
+    result.then((result) => {
+      for (let index = 0; index < result.length; index++) {
+        result[index]["show"] = false;
+      }
+      setExperimentList(result)
+      setFilteredExperiments(result)
+    });
+    
   }, []);
 
-  const filteredExperiments = experimentList.filter((experiment) =>
-    experiment.name.toLowerCase().includes(searchText.toLowerCase())
-  );
+  const toggleHide = (idx) => {
+    const tmp = []
+    for (let index = 0; index < filteredExperiments.length; index++) {
+      tmp.push(filteredExperiments[index])
+      if (idx == index) {
+        tmp[index]["show"] = true
+      }
+
+    }
+    setFilteredExperiments(tmp)
+    console.log(filteredExperiments)
+  }
+
+  const handleChange = (e) => {
+    setSearchText(e.target.value)
+    setFilteredExperiments(experimentList.filter((experiment) =>
+      experiment.name.toLowerCase().includes(searchText.toLowerCase()))
+    )
+  }
 
   return (
     <div>
@@ -31,11 +58,15 @@ const ClassificationExperiment = (props) => {
         type="text"
         placeholder="Pesquisar experimento..."
         value={searchText}
-        onChange={(e) => setSearchText(e.target.value)}
+        onChange={(e) => handleChange(e)}
       />
       <ul>
-        {filteredExperiments.map((experiment) => (
-          <li key={experiment.id}>{experiment.name}</li>
+        {filteredExperiments.map((experiment, idx) => (
+          <li key={experiment.id}>
+            {experiment.name}
+            <button onClick={() => toggleHide(idx)} >Adicionar tag</button>
+            {experiment.show && <AddTag/>}
+          </li>
         ))}
       </ul>
     </div>
