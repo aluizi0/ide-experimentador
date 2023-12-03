@@ -4,53 +4,53 @@ class ExperimentController < ApplicationController
     render
   end
 
-  def create
+  def create 
     # Check if params are valid
-    if params['nameExperiment'].nil? || params['factors'].nil? || params['trials'].nil?
+    if params['experimentName'].nil? || params['factors'].nil?
       render json: { error: 'Invalid params' }, status: :unprocessable_entity
       return
     end
 
-    # Check if factors are valid
-    factors_ = params['factors']
-    factors_.each do |name, value|
-      if name.nil? || value.nil?
-        render json: { error: 'Invalid factors' }, status: :unprocessable_entity
-        return
-      end
+    # Check if factors is a hash with arrays as values
+    if params['factors'].class != ActionController::Parameters || params['factors'].values.any? { |value| value.class != Array }
+      puts params['factors'].class
+      render json: { error: 'Invalid params' }, status: :unprocessable_entity
+      return
     end
 
-    # Check if trials are valid
-    trials = params['trials']
-    trials.each do |name, factors|
-      if name.nil? || factors.nil?
-        render json: { error: 'Invalid trials' }, status: :unprocessable_entity
-        return
-      end
-      factors.each do |factor|
-        if factors_[factor].nil?
-          render json: { error: 'Invalid trials' }, status: :unprocessable_entity
-          return
+    # Save experiment
+    experiment = Experiment.create(name: params['experimentName'], disabled: false)
+
+    # Save factors (should not save if factor with same name and value already exists)
+    params['factors'].each do |factor|
+      factor[1].each do |value|
+        if Factor.where(name: factor[0], value: value).empty?
+          Factor.create(name: factor[0], value: value)
         end
       end
     end
 
-    # Save factors
-    factors = params['factors']
-    saved_factors = {}
-    factors.each do |name, value|
-      saved_factors[name] = Factor.create(name: name, value: value)
-    end
+    # Generate all possible combinations of factors and save them
+    # as [{factor1: value1, factor2: value1}, {factor1: value1, factor2: value2}, ...]
 
-    # Save experiment
-    experiment = Experiment.create(name: params['nameExperiment'], disabled: false)
+    # Get all factors from the request
+    factors = params['factors'].keys
 
-    # Save trials
-    trials = params['trials']
-    trials.each do |name, factors|
-      trial = Trial.create(name: name, experiment_id: experiment.id, disabled: false, deleted: false, runs: 0)
-      factors.each do |factor|
-        TrialFactor.create(trial_id: trial.id, factor_id: saved_factors[factor].id)
+    # Get all values from the request
+    values = params['factors'].values
+
+    # Get all possible combinations of values
+    combinations = values[0].product(*values[1..-1])
+
+    # Save all combinations
+    combinations.each do |combination|
+      # Create trial
+      trial = Trial.create(name: combination.join('-'), disabled: false, deleted: false, runs: 0, experiment_id: experiment.id)
+
+      # Create trial factors
+      combination.each do |value|
+        factor = Factor.where(name: factors[combination.index(value)], value: value).first
+        TrialFactor.create(factor_id: factor.id, trial_id: trial.id)
       end
     end
 
@@ -59,4 +59,12 @@ class ExperimentController < ApplicationController
     rescue StandardError => e
       render json: { error: e.message }, status: :unprocessable_entity
   end
+
+
+  # GET all experiments
+  def get_all
+    experiments = Experiment.all
+    render json: { experiments: experiments }, status: :ok
+  end
+
 end
