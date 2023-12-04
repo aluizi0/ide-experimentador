@@ -4,7 +4,7 @@ class ExperimentController < ApplicationController
     render
   end
 
-  def create 
+  def create
     # Check if params are valid
     if params['experimentName'].nil? || params['factors'].nil?
       render json: { error: 'Invalid params' }, status: :unprocessable_entity
@@ -63,7 +63,24 @@ class ExperimentController < ApplicationController
 
   # GET all experiments
   def get_all
+    # Join experiment tags
     experiments = Experiment.all
+
+    # Get all experiment_tags
+    experiment_tags = ExperimentTag.all
+
+    # Get all tags
+    tags = Tag.all
+
+    # Join experiment_tags and tags
+    experiments = experiments.map do |experiment|
+      experiment_tags = experiment_tags.select { |experiment_tag| experiment_tag.experiment_id == experiment.id }
+      tags = experiment_tags.map do |experiment_tag|
+        tags.select { |tag| tag.id == experiment_tag.tag_id }.first
+      end
+      { experiment: experiment, tags: tags }
+    end
+
     render json: { experiments: experiments }, status: :ok
   end
 
@@ -95,6 +112,40 @@ class ExperimentController < ApplicationController
     # Add tag to experiment
     experiment_tag = ExperimentTag.create(experiment_id: params['experiment_id'], tag_id: params['tag_id'])
     render json: { message: 'success', experiment_tag: experiment_tag }, status: :ok
+
+    rescue StandardError => e
+      render json: { error: e.message }, status: :unprocessable_entity
+  end
+
+  def remove_tag
+    # Check if params are valid
+    if params['experiment_id'].nil? || params['tag_id'].nil?
+      render json: { error: 'Invalid params' }, status: :unprocessable_entity
+      return
+    end
+
+    # Check if experiment exists
+    if Experiment.where(id: params['experiment_id']).empty?
+      render json: { error: 'Experiment not found' }, status: :not_found
+      return
+    end
+
+    # Check if tag exists
+    if Tag.where(id: params['tag_id']).empty?
+      render json: { error: 'Tag not found' }, status: :not_found
+      return
+    end
+
+    # Check if experiment has tag
+    if ExperimentTag.where(experiment_id: params['experiment_id'], tag_id: params['tag_id']).empty?
+      render json: { error: 'Experiment does not have tag' }, status: :unprocessable_entity
+      return
+    end
+
+    # Remove tag from experiment
+    experiment_tag = ExperimentTag.where(experiment_id: params['experiment_id'], tag_id: params['tag_id']).first
+    experiment_tag.destroy
+    render json: { message: 'success' }, status: :ok
 
     rescue StandardError => e
       render json: { error: e.message }, status: :unprocessable_entity

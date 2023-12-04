@@ -9,6 +9,7 @@ Rails.application.routes.draw do
   post 'tags/create', to: "tags#create"
   get 'tags/get_all', to: "tags#get_all"
   post 'experiment/add_tag', to: "experiment#add_tag"
+  delete 'experiment/remove_tag', to: "experiment#remove_tag"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
