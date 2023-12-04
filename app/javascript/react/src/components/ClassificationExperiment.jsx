@@ -1,54 +1,79 @@
 import React, { useEffect, useState } from "react";
-import AddTag from "./AddTag";
+import toast from "react-simple-toasts";
+import 'react-simple-toasts/dist/theme/success.css';
+import 'react-simple-toasts/dist/theme/failure.css';
 
 const ClassificationExperiment = (props) => {
   const [experimentList, setExperimentList] = useState([]);
   const [filteredExperiments, setFilteredExperiments] = useState([]); 
   const [searchText, setSearchText] = useState("");
+  const [tags, setTags] = useState([])
+
+  const fetchExperiments = async () => {
+    try {
+      const response = await fetch("/experiment/get_all");
+      const data = (await response.json()).experiments;
+      setExperimentList(data)
+      setFilteredExperiments(data)
+    } catch (error) {
+      console.error("Error fetching experiments:", error);
+    }
+  };
 
   useEffect(() => {
-    // Fetch experiments from the API
-    const fetchExperiments = async () => {
-      const response = await fetch("/experiment/get_all");
-      const data = await response.json();
+    fetchExperiments();
 
-      if (response.ok) {
-        setExperimentList(data.experiments);
-        return data.experiments
-      } else {
-        console.error("Error fetching experiments:", data.error);
-      }
-    };
-
-    const result = fetchExperiments();
-    result.then((result) => {
-      for (let index = 0; index < result.length; index++) {
-        result[index]["show"] = false;
-      }
-      setExperimentList(result)
-      setFilteredExperiments(result)
-    });
-    
+    fetch("/tags/get_all")
+    .then((response) => response.json())
+    .then((data) => {
+        setTags(data)
+        return data
+    }).catch((error) => {
+        console.error("Error fetching tags:", error)
+    })
   }, []);
-
-  const toggleHide = (idx) => {
-    const tmp = []
-    for (let index = 0; index < filteredExperiments.length; index++) {
-      tmp.push(filteredExperiments[index])
-      if (idx == index) {
-        tmp[index]["show"] = true
-      }
-
-    }
-    setFilteredExperiments(tmp)
-    console.log(filteredExperiments)
-  }
 
   const handleChange = (e) => {
     setSearchText(e.target.value)
     setFilteredExperiments(experimentList.filter((experiment) =>
       experiment.name.toLowerCase().includes(searchText.toLowerCase()))
     )
+  }
+
+  const addTag = (experimentId, tagId) => {
+    const data = { experiment_id: experimentId, tag_id: parseInt(tagId) }
+
+    fetch("/experiment/add_tag", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }).then((response) => {
+      fetchExperiments();
+      toast("Tag adicionada com sucesso!", { theme: "success", position: "top-right" });
+    }).catch((error) => {
+      console.error("Error adding tag:", error)
+      toast("Erro ao adicionar tag!", { theme: "failure", position: "top-right" });
+    })
+  }
+
+  const removeTag = (experimentId, tagId) => {
+    const data = { experiment_id: experimentId, tag_id: parseInt(tagId) }
+
+    fetch("/experiment/remove_tag", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }).then((response) => {
+      fetchExperiments();
+      toast("Tag removida com sucesso!", { theme: "success", position: "top-right" });
+    }).catch((error) => {
+      console.error("Error removing tag:", error)
+      toast("Erro ao remover tag!", { theme: "failure", position: "top-right" });
+    })
   }
 
   return (
@@ -61,11 +86,25 @@ const ClassificationExperiment = (props) => {
         onChange={(e) => handleChange(e)}
       />
       <ul>
-        {filteredExperiments.map((experiment, idx) => (
+        {filteredExperiments.map(({experiment, tags: tags_}) => (
           <li key={experiment.id}>
             {experiment.name}
-            <button onClick={() => toggleHide(idx)} >Adicionar tag</button>
-            {experiment.show && <AddTag/>}
+            <select onChange={(e) => addTag(experiment.id, e.target.value)} id={`select-${experiment.id}`}>
+              {tags.map((tag) => (
+                <option value={tag.id} key={tag.id} id={`tag-${tag.id}`}>
+                  {tag.name}
+                </option>
+              ))}
+            </select>
+
+            <ul>
+              {tags_.map((tag) => (
+                <li key={tag.id}>
+                  {tag.name}
+                  <button onClick={() => removeTag(experiment.id, tag.id)}>X</button>
+                </li>
+              ))}
+            </ul>
           </li>
         ))}
       </ul>
