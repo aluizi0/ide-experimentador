@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import toast from "react-simple-toasts";
-import 'react-simple-toasts/dist/theme/success.css';
-import 'react-simple-toasts/dist/theme/failure.css';
-
+import { useClickAway } from "@uidotdev/usehooks";
 
 const CreateExperiment = () => {
 	const [experimentName, setExperimentName] = useState(
@@ -10,6 +8,15 @@ const CreateExperiment = () => {
 	);
 	const [factors, setFactors] = useState(JSON.parse(localStorage.getItem("factors")) || {});
 	const [value, setValue] = useState("");
+	const [open, setOpen] = useState(null);
+
+	const handleOpen = ({ experiment, trials }) => {
+		setOpen({ experiment, trials });
+	};
+	const handleClose = () => {
+		setOpen(null);
+	};
+	const ref = useClickAway(handleClose);
 
 	addFactor = (name) => {
 		if (name.length > 0 && !Object.keys(factors).includes(name)) {
@@ -39,7 +46,6 @@ const CreateExperiment = () => {
 		setFactors(newFactors);
 	};
 
-
 	submitExperiment = () => {
 		const data = { experimentName, factors };
 
@@ -54,23 +60,26 @@ const CreateExperiment = () => {
 		})
 			.then(async (res) => {
 				const parse = JSON.parse(await res.text());
-				console.log(parse);
 				return parse;
 			})
 			.then((res) => {
 				if (res?.error) {
 					toast("Erro ao criar o experimento!", {
-						position: "top-right", theme: "failure"
-					})
+						position: "top-right",
+						theme: "failure",
+					});
 					return;
 				}
+				handleOpen(res);
 				toast("Experimento criado com sucesso!", { position: "top-right", theme: "success" });
 				clearExperiment();
-			}).catch((err) => {
-				toast("Erro ao criar o experimento!", {
-					position: "top-right", theme: "failure"
-				})
 			})
+			.catch((err) => {
+				toast("Erro ao criar o experimento!", {
+					position: "top-right",
+					theme: "failure",
+				});
+			});
 	};
 
 	clearExperiment = () => {
@@ -85,31 +94,63 @@ const CreateExperiment = () => {
 	}, [experimentName, factors]);
 
 	return (
-		<div className="outer-container">
-			<div className="container">
-				<h1>Criar Experimento</h1>
-				<form>
-					<div>
+		<>
+			{/* Modal de experimento criado */}
+			<div id="experimentModal" className="modal" style={{ display: open ? "block" : "none" }}>
+				<div className="modal-content" ref={ref}>
+					<div className="modal-header">
+						<h2>Experimento criado</h2>
+						<button className="close" id="closeModal" onClick={handleClose}>
+							&times;
+						</button>
+					</div>
+					<div className="modal-body">
+						<div className="experiment-info">
+							<p>{open?.experiment?.name}</p>
+							<span>{open?.experiment?.id}</span>
+						</div>
+						<h3>Ensaios</h3>
+						{open?.trials?.map((trial) => (
+							<div key={trial.trial.id} className="exp-info-trial">
+								<div className="experiment-info">
+									<h4>Ensaio {trial.trial.name}</h4>
+									<span>{trial.trial.id}</span>
+								</div>
+								<h5>Fatores</h5>
+								<table>
+									<tbody>
+										{trial.factors.map((factor) => (
+											<tr key={factor.id}>
+												<td>{factor.name}</td>
+												<td>{factor.value}</td>
+											</tr>
+										))}
+									</tbody>
+								</table>
+							</div>
+						))}
+					</div>
+				</div>
+			</div>
+			{/* Fim do modal de experimento criado */}
+
+			{/* Formulário de criação de experimento */}
+			<div className="outer-container">
+				<div className="form-container">
+					<h1>Criar Experimento</h1>
+					<form>
 						<input
 							id="experimentName"
 							placeholder="Nome do experimento"
 							type="text"
-							className="input-arredondado"
 							value={experimentName}
 							onChange={(e) => setExperimentName(e.target.value)}
 						/>
-					</div>
-					<div>
+						<hr></hr>
 						<h3>Adicionar fator</h3>
-						<input
-							type="text"
-							className="input-arredondado"
-							id="factorName"
-							placeholder="Nome do fator"
-						/>
+						<input type="text" id="factorName" placeholder="Nome do fator" />
 						<button
 							id="addFactor"
-							className="botao-responsivo"
 							type="button"
 							onClick={() => addFactor(document.getElementById("factorName").value)}
 						>
@@ -118,65 +159,47 @@ const CreateExperiment = () => {
 						<p>Valor para fator</p>
 						<input
 							type="text"
-							className="input-arredondado"
 							id="factorValue"
 							placeholder="Valor do fator"
 							value={value}
 							onChange={(e) => setValue(e.target.value)}
 						/>
-					</div>
-					<button
-						className="botao-responsivo"
-						type="button"
-						id="createExperiment"
-						onClick={submitExperiment}
-					>
-						Criar experimento
-					</button>
-					<button className="botao-responsivo-secundario" type="button" onClick={clearExperiment}>
-						Limpar
-					</button>
-				</form>
-			</div>
-			<div className="trial-container">
-				<h2>Fatores</h2>
-				{Object.keys(factors).map((factor) => (
-					<div key={factor} className="trail">
-						<div className="trail-row">
-							{factor}
-							<div>
-								<div
-									onClick={() => addValueToFactor(factor, value)}
-									role="button"
-									className="botao-responsivo"
-								>
-									Adicionar valor ao fator
+						<span className="info">
+							Para adicionar o valor inserido ao fator, clique no botão 'Adicionar valor' ao lado do
+							nome do fator na seção 'Fatores'.
+						</span>
+						<button type="button" id="createExperiment" onClick={submitExperiment}>
+							Criar experimento
+						</button>
+						<button type="button" onClick={clearExperiment}>
+							Limpar
+						</button>
+					</form>
+				</div>
+				<div className="trial-container">
+					<h1>Fatores</h1>
+					{Object.keys(factors).map((factor) => (
+						<div key={factor} className="trial">
+							<div className="trial-header">
+								{factor}
+								<div>
+									<button id={`add-to-${factor}`} onClick={() => addValueToFactor(factor, value)}>Adicionar valor</button>
+									<button onClick={() => removeFactor(factor)}>&times;</button>
 								</div>
-								<button
-									className="botao-responsivo-secundario"
-									type="button"
-									onClick={() => removeFactor(factor)}
-								>
-									Remover
-								</button>
 							</div>
+							{factors[factor].map((value) => (
+								<div key={value} className="factor-trial">
+									{value}
+									<button type="button" onClick={() => removeValueFromFactor(factor, value)}>
+										&times;
+									</button>
+								</div>
+							))}
 						</div>
-						{factors[factor].map((value) => (
-							<div key={value} className="factor-trail">
-								{value}
-								<button
-									className="botao-responsivo-secundario"
-									type="button"
-									onClick={() => removeValueFromFactor(factor, value)}
-								>
-									Remover
-								</button>
-							</div>
-						))}
-					</div>
-				))}
+					))}
+				</div>
 			</div>
-		</div>
+		</>
 	);
 };
 
