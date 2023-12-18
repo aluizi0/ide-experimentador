@@ -1,154 +1,230 @@
+# Purpose: Handle requests for experiments
 class ExperimentController < ApplicationController
   skip_forgery_protection
-  def index
-    render
-  end
 
+  # POST create experiment
+  # Params:
+  #   experimentName: string
+  #   factors: { factorName: [factorValue1, factorValue2, ...], ... }
+  # Returns:
+  #   message: string
+  #   experiment: { id: integer, name: string, disabled: boolean, created_at: datetime, updated_at: datetime }
+  #   trials: [
+  #     {
+  #       trial: { id: integer, name: string, disabled: boolean, deleted: boolean, runs: integer, experiment_id: integer, created_at: datetime, updated_at: datetime },
+  #       factors: [
+  #         { id: integer, name: string, value: string, created_at: datetime, updated_at: datetime },
+  #         ...
+  #       ]
+  #     },
+  #     ...
+  #   ]
+  #   error: string
+  #   status: integer
   def create
-    # Check if params are valid
-    if params['experimentName'].nil? || params['factors'].nil?
-      render json: { error: 'Invalid params' }, status: :unprocessable_entity
-      return
-    end
+    experiment_name = params['experimentName']
+    factors = params['factors']
+    return render_unprocessable_entity("Invalid params") unless create_params_are_valid(experiment_name, factors)
 
-    # Check if factors is a hash with arrays as values
-    if params['factors'].class != ActionController::Parameters || params['factors'].values.any? { |value| value.class != Array }
-      puts params['factors'].class
-      render json: { error: 'Invalid params' }, status: :unprocessable_entity
-      return
-    end
+    experiment = save_experiment(experiment_name, factors)
 
-    # Save experiment
-    experiment = Experiment.create(name: params['experimentName'], disabled: false)
-
-    # Save factors (should not save if factor with same name and value already exists)
-    params['factors'].each do |factor|
-      factor[1].each do |value|
-        if Factor.where(name: factor[0], value: value).empty?
-          Factor.create(name: factor[0], value: value)
-        end
-      end
-    end
-
-    # Generate all possible combinations of factors and save them
-    # as [{factor1: value1, factor2: value1}, {factor1: value1, factor2: value2}, ...]
-
-    # Get all factors from the request
-    factors = params['factors'].keys
-
-    # Get all values from the request
-    values = params['factors'].values
-
-    # Get all possible combinations of values
-    combinations = values[0].product(*values[1..-1])
-
-    # Save all combinations
-    combinations.each do |combination|
-      # Create trial
-      trial = Trial.create(name: combination.join('-'), disabled: false, deleted: false, runs: 0, experiment_id: experiment.id)
-
-      # Create trial factors
-      combination.each do |value|
-        factor = Factor.where(name: factors[combination.index(value)], value: value).first
-        TrialFactor.create(factor_id: factor.id, trial_id: trial.id)
-      end
-    end
-
-    render json: { message: 'success', experiment: experiment }, status: :ok
-
-    rescue StandardError => e
-      render json: { error: e.message }, status: :unprocessable_entity
+    render_experiment_and_trials(experiment.id)
+    rescue StandardError => error
+      render_unprocessable_entity(error.message)
   end
 
 
   # GET all experiments
+  # Returns:
+  #   experiments: [
+  #     {
+  #       experiment: { id: integer, name: string, disabled: boolean, created_at: datetime, updated_at: datetime },
+  #       tags: [
+  #         { id: integer, name: string, color: string, created_at: datetime, updated_at: datetime },
+  #         ...
+  #       ]
+  #     },
+  #     ...
+  #   ]
   def get_all
-    # Join experiment tags
-    experiments = Experiment.all
+    experiments_with_tags = Experiment.includes(:experiment_tag => :tag)
 
-    # Get all experiment_tags
-    experiment_tags = ExperimentTag.all
-
-    # Get all tags
-    tags = Tag.all
-
-    # Join experiment_tags and tags
-    experiments = experiments.map do |experiment|
-      experiment_tags = experiment_tags.select { |experiment_tag| experiment_tag.experiment_id == experiment.id }
-      tags = experiment_tags.map do |experiment_tag|
-        tags.select { |tag| tag.id == experiment_tag.tag_id }.first
-      end
-      { experiment: experiment, tags: tags }
+    experiments = experiments_with_tags.map do |experiment|
+      experiment_tags = experiment.experiment_tag.map(&:tag)
+      { experiment: experiment, tags: experiment_tags }
     end
 
     render json: { experiments: experiments }, status: :ok
   end
 
+  # POST add tag to experiment
+  # Params:
+  #   experiment_id: integer
+  #   tag_id: integer
+  # Returns:
+  #   message: string
+  #   experiment_tag: { id: integer, experiment_id: integer, tag_id: integer, created_at: datetime, updated_at: datetime }
+  #   error: string
+  #   status: integer
   def add_tag
-    # Check if params are valid
-    if params['experiment_id'].nil? || params['tag_id'].nil?
-      render json: { error: 'Invalid params' }, status: :unprocessable_entity
-      return
-    end
+    exp_id = params['experiment_id']
+    tag_id = params['tag_id']
 
-    # Check if experiment exists
-    if Experiment.where(id: params['experiment_id']).empty?
-      render json: { error: 'Experiment not found' }, status: :not_found
-      return
-    end
+    return render_not_found('Experiment not found') if Experiment.where(id: exp_id).empty?
 
-    # Check if tag exists
-    if Tag.where(id: params['tag_id']).empty?
-      render json: { error: 'Tag not found' }, status: :not_found
-      return
-    end
+    return render_not_found('Tag not found') if Tag.where(id: tag_id).empty?
 
-    # Check if experiment already has tag
-    if ExperimentTag.where(experiment_id: params['experiment_id'], tag_id: params['tag_id']).any?
-      render json: { error: 'Experiment already has tag' }, status: :unprocessable_entity
-      return
-    end
+    return render_unprocessable_entity('Experiment already has tag') \
+      if ExperimentTag.where(experiment_id: exp_id, tag_id: tag_id).any?
+
 
     # Add tag to experiment
-    experiment_tag = ExperimentTag.create(experiment_id: params['experiment_id'], tag_id: params['tag_id'])
+    experiment_tag = ExperimentTag.create(experiment_id: exp_id, tag_id: tag_id)
     render json: { message: 'success', experiment_tag: experiment_tag }, status: :ok
 
-    rescue StandardError => e
-      render json: { error: e.message }, status: :unprocessable_entity
+    rescue StandardError => error
+      return render_unprocessable_entity(error.message)
   end
 
+  # DELETE remove tag from experiment
+  # Params:
+  #   experiment_id: integer
+  #   tag_id: integer
+  # Returns:
+  #   message: string
+  #   error: string
+  #   status: integer
   def remove_tag
-    # Check if params are valid
-    if params['experiment_id'].nil? || params['tag_id'].nil?
-      render json: { error: 'Invalid params' }, status: :unprocessable_entity
-      return
-    end
+    exp_id = params['experiment_id']
+    tag_id = params['tag_id']
 
-    # Check if experiment exists
-    if Experiment.where(id: params['experiment_id']).empty?
-      render json: { error: 'Experiment not found' }, status: :not_found
-      return
-    end
+    return render_not_found('Experiment not found') if Experiment.where(id: exp_id).empty?
 
-    # Check if tag exists
-    if Tag.where(id: params['tag_id']).empty?
-      render json: { error: 'Tag not found' }, status: :not_found
-      return
-    end
+    return render_not_found('Tag not found') if Tag.where(id: tag_id).empty?
 
-    # Check if experiment has tag
-    if ExperimentTag.where(experiment_id: params['experiment_id'], tag_id: params['tag_id']).empty?
-      render json: { error: 'Experiment does not have tag' }, status: :unprocessable_entity
-      return
-    end
+    experiment_tag = ExperimentTag.where(experiment_id: exp_id, tag_id: tag_id).first
 
-    # Remove tag from experiment
-    experiment_tag = ExperimentTag.where(experiment_id: params['experiment_id'], tag_id: params['tag_id']).first
+    return render_unprocessable_entity('Experiment does not have tag') unless experiment_tag&.present?
+
+
     experiment_tag.destroy
     render json: { message: 'success' }, status: :ok
 
-    rescue StandardError => e
-      render json: { error: e.message }, status: :unprocessable_entity
+    rescue StandardError => error
+      render_unprocessable_entity(error.message)
+  end
+
+  private
+
+  # Check if params are valid
+  # Params:
+  #   experiment_name: string
+  #   factors: { factorName: [factorValue1, factorValue2, ...], ... }
+  # Returns:
+  #   boolean
+  def create_params_are_valid(experiment_name, factors)
+     factors&.is_a?(ActionController::Parameters) \
+      && factors.values.all? { |value| value.is_a?(Array) && value.length >= 1 } \
+      && factors.keys.all? { |key| key.is_a?(String) } \
+      && experiment_name.is_a?(String) \
+      && experiment_name.length >= 1
+  end
+
+  def render_not_found(message)
+    render json: { error: message }, status: :not_found
+  end
+
+  def render_unprocessable_entity(message)
+    render json: { error: message }, status: :unprocessable_entity
+  end
+
+  # Save experiment and its factors and combinations
+  # Params:
+  #   experiment_name: string
+  #   factors: { factorName: [factorValue1, factorValue2, ...], ... }
+  # Returns:
+  #   experiment: { id: integer, name: string, disabled: boolean, created_at: datetime, updated_at: datetime }
+  def save_experiment(experiment_name, factors)
+    experiment = Experiment.create(name: experiment_name, disabled: false)
+    save_factors(factors)
+    values = factors.values
+    save_combinations(experiment.id, factors.keys, values[0].product(*values[1..-1]))
+    return experiment
+  end
+
+  # Save factors
+  # Params:
+  #   factors: { factorName: [factorValue1, factorValue2, ...], ... }
+  # Returns:
+  #   void
+  def save_factors(factors)
+    # Save factors (should not save if factor with same name and value already exists)
+    factors.each do |factor_name, factor_values|
+      save_factor(factor_name, factor_values)
+    end
+  end
+
+  def save_factor(factor_name, factor_values)
+    factor_values.each do |value|
+      if Factor.where(name: factor_name, value: value).empty?
+        Factor.create(name: factor_name, value: value)
+      end
+    end
+  end
+
+  # Save combinations
+  # Generate all possible combinations of factors and save them
+  # as [{factor1: value1, factor2: value1}, {factor1: value1, factor2: value2}, ...]
+  # Params:
+  #   experiment_id: integer
+  #   factors: [factorName1, factorName2, ...]
+  #   values: [[factorValue1, factorValue2, ...], [factorValue1, factorValue2, ...], ...]
+  # Returns:
+  #   void
+  def save_combinations(experiment_id, keys, combinations)
+    # combinations_keys looks like:
+    # [ [ [factor1: value1, factor2: value1], [factor1: value1, factor2: value2], ... ],
+    combinations_keys = combinations.map do |combination|
+      keys.zip(combination).map { |key, value| { key => value } }
+    end
+
+    combinations_keys.each do |combination|
+      save_trial(experiment_id, combination)
+    end
+  end
+
+  def save_trial(experiment_id, combination)
+    # Name is the combination of values e.g. value1-value2-value3
+    name = combination.map { |factor| factor.values[0] }.join('-')
+    trial = Trial.create(name: name, disabled: false, deleted: false, runs: 0, experiment_id: experiment_id)
+
+    combination.each do |value|
+      factor = Factor.where(name: value.keys[0], value: value.values[0]).first
+      TrialFactor.create(factor_id: factor.id, trial_id: trial.id)
+    end
+  end
+
+
+  def render_experiment_and_trials(experiment_id)
+    experiment = Experiment.find(experiment_id)
+    trials = get_trials(experiment_id)
+    render json: {
+      message: 'success',
+      experiment: experiment,
+      trials: trials
+    }, status: :ok
+  end
+
+  def get_trials(experiment_id)
+    Trial.where(experiment_id: experiment_id).map do |trial|
+      factors = get_factors(trial.id)
+      { trial: trial, factors: factors }
+    end
+  end
+
+  def get_factors(trial_id)
+    trial_factors = TrialFactor.where(trial_id: trial_id)
+    trial_factors.map { |trial_factor| Factor.find(trial_factor.factor_id) }
   end
 
 end
