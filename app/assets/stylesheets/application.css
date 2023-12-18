@@ -14,216 +14,198 @@
  *= require_self
  */
 
-ul {
+/* Reset margins and paddings for specific elements */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+a,
+ul,
+ol,
+li {
 	margin: 0;
 	padding: 0;
-	list-style-type: none;
 }
 
-.outer-container {
-	display: flex;
-	flex-direction: row;
-  flex-wrap: wrap;
-	border-radius: 10px; /* Cantos arredondados de 10px */
-	gap: 20px; /* Espaçamento entre os elementos */
-	padding: 20px; /* Espaçamento interno */
+:root {
+	--background-color: #edf2f4;
+	--form-background-color: #8d99ae;
+	--trial-background-color: #8d99ae;
+  --class-exp-background-color: #8d99ae;
+  --class-exp-tag-background-color: #edf2f4;
 }
 
-.container {
-  padding: 0 20px;
-  background-color: #f5f5f5;
-  min-width: 300px; /* Ajustar a largura conforme necessário */
-  border-radius: 8px; /* Cantos arredondados de 8px */
+* {
+  
+	font-family: "Roboto", sans-serif;
 }
 
-.container form {
-	display: flex;
-	flex-direction: column;
-	gap: 10px; /* Espaçamento entre os elementos */
-	width: fit-content; /* Ajustar a largura conforme necessário */
-	box-sizing: border-box; /* Incluir padding e border na largura e altura */
-}
-
-.outer-container h1, h2, h3, h4, h5, h6 {
-  font-family: "Roboto", sans-serif; /* Substitua pelo nome real da sua fonte */
-  font-size: 24px; /* Tamanho da fonte do título */
-  font-weight: bold; /* Negrito */
-  color: #333; /* Cor do texto */
-  margin-top: 5px;
-  margin-bottom: 5px; /* Espaçamento inferior para dar mais espaço */
-  letter-spacing: 2px; /* Espaçamento entre as letras */
-  line-height: 1.2; /* Altura da linha para melhor legibilidade */
-  /* Adiciona bordas arredondadas às letras */
-  border-radius: 10px; /* Valor de border-radius para ajustar a curvatura */
-  display: inline-block; /* Para que o border-radius seja aplicado corretamente */
-  background-color: #f0f0f0; /* Cor de fundo para cobrir os espaços vazios após arredondar */
-  padding: 5px 10px; /* Adiciona algum preenchimento para espaçamento interno */
-}
-
-.outer-container p {
-  margin: 5px 0; /* Espaçamento superior e inferior */
-}
-
-.outer-container {
-  font-family: "Roboto", sans-serif; /* Substitua pelo nome real da sua fonte */
-  font-size: 15px; /* Tamanho da fonte do título */
-  color: #333; /* Cor do texto */
-  letter-spacing: 2px; /* Espaçamento entre as letras */
-  line-height: 1.2; /* Altura da linha para melhor legibilidade */
-}
-
-.container button {
-  width: fit-content;
-}
-
-.container form div {
+/* Classificate Experiment Component */
+.classification-experiment {
+  color: #2b2d42;
   display: flex;
   flex-direction: column;
-  flex-wrap: wrap;
-  gap: 5px;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  background-color: var(--class-exp-background-color);
+  max-width: 300px;
+  width: 100%;
+  max-height: 600px;
+  box-sizing: border-box;
 }
 
-.list-container {
-  border-radius: 8px;
-  padding: 0 20px;
-  background-color: #f5f5f5;
-	min-width: 300px; /* Ajustar a largura conforme necessário */
-	width: fit-content; /* Ajustar a largura conforme necessário */
-	box-sizing: border-box; /* Incluir padding e border na largura e altura */
+.classification-experiment > h1 {
+  margin-bottom: 10px;
 }
 
-.list-container li {
-  display:flex;
-  flex-direction: row;
-  justify-content: space-between;
-  padding: 5px; /* Espaçamento interno */
-  border-radius: 8px; /* Cantos arredondados de 8px */
-}
-
-.list-container li:nth-child(odd) {
-  background-color: lightgray; /* Set the background color for odd items */
-}
-
-.outer-container {
-  padding: 20px;
-  border-radius: 4px;
+.classification-experiment > input {
+  padding: 10px;
   border: 1px solid #ddd;
+  border-radius: 8px;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease;
+  font-size: 10px;
 }
 
-.outer-container h2 {
-  font-size: 1.5em;
-  margin-bottom: 10px;
+.classification-experiment > input:focus {
+  border-color: #3498db;
 }
 
-.outer-container ul {
+.classification-experiment > ul {
   list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.outer-container li {
-  margin-bottom: 5px;
-  padding: 5px;
-  border-radius: 4px;
-  background-color: #f5f5f5;
-}
-
-.trial-container {
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  padding: 0 20px;
-  min-width: 300px; /* Ajustar a largura conforme necessário */
-  border-radius: 8px; /* Cantos arredondados de 8px */
-  background-color: #f5f5f5;
+  gap: 10px;
+  max-height: 100%;
+  overflow-y: auto;
 }
 
-.trail {
-  display:flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 5px; /* Espaçamento interno */
-  border-radius: 8px; /* Cantos arredondados de 8px */
+.classification-experiment > ul > li {
+  background-color: var(--class-exp-tag-background-color);
+  padding: 10px;
+  border-radius: 10px;
+  margin-right: 10px;
 }
 
-.trial-container .trail:nth-child(odd) {
-  background-color: lightgray; /* Set the background color for odd items */
-}
-
-.trial-container .trail:nth-child(even) {
-  background-color: #f0f0f0; /* Set the background color for odd items */
-}
-
-.trial-container .trail:nth-child(even) .trail-row {
-  background-color: lightgray; /* Set the background color for odd items */
-}
-.trial-container .trail:nth-child(odd) .trail-row {
-  background-color: #f0f0f0; /* Set the background color for odd items */
-}
-
-.trail-row {
-  padding: 5px;
-}
-
-.trail-row > div {
+.class-exp-tags ul {
+  list-style: none;
   display: flex;
   flex-direction: row;
-  gap: 5px;
+  flex-wrap: wrap;
+  gap: 10px;
+  max-height: 100%;
+  overflow-y: auto;
 }
 
-.trail-row {
-  display:flex;
-  flex-direction: row;
+.class-exp-tags ul > li {
+  background-color: var(--class-exp-tag-background-color);
+  padding: 5px;
+  border-radius: 10px;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.experiment-tags-header {
+  display: flex;
   justify-content: space-between;
   align-items: center;
-  border-radius: 8px; /* Cantos arredondados de 8px */
+  background-color: #e0e1dd;
+  padding: 6px;
+  border-radius: 10px;
   margin-bottom: 10px;
 }
 
-.factor-trail {
-  display:flex;
-  flex-direction: row;
+.experiment-tags-header > button {
+  font-size: 15px;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  background-color: #8d99ae;
+  color: #000;
+}
+
+.experiment-tags {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.experiment-tags li {
+  display: flex;
   justify-content: space-between;
   align-items: center;
-  border-radius: 8px; /* Cantos arredondados de 8px */
+  padding: 6px;
+  background-color: #d6ccc2;
+  border-radius: 10px;
+}
+
+.experiment-tags li > span {
+  font-size: 10px;
+  background-color: #edede9;
+  padding: 5px;
+  border-radius: 10px;
+}
+
+.experiment-tags button {
+  font-size: 9px;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  background-color: #8d99ae;
+  color: #000;
+}
+
+/* Create Experiment Component */
+
+.info {
+  color: #2b2d42;
+  font-size: 10px;
+}
+
+.outer-container {
+	color: #2b2d42;
+	display: flex;
+	background-color: var(--background-color);
+	flex-wrap: wrap;
+	gap: 20px;
+	padding: 10px;
+	border-radius: 10px;
+}
+
+.form-container > h1, .trial-container > h1 {
   margin-bottom: 10px;
-  padding: 5px; /* Espaçamento interno */
 }
 
-.trail .factor-trail:nth-child(odd) {
-  background-color: #f0f0f0;; /* Set the background color for odd items */
+.form-container {
+	background-color: var(--form-background-color);
+	padding: 10px;
+	border-radius: 10px;
+  max-width: 300px;
+  width: 100%;
 }
 
-.trail .factor-trail:nth-child(even) {
-  background-color: lightgray; /* Set the background color for odd items */
+.form-container > form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.label-title {
-	font-family: "Roboto", sans-serif; /* Substitua pelo nome real da sua fonte */
-	font-size: 24px; /* Tamanho da fonte do título */
-	font-weight: bold; /* Negrito */
-	color: #333; /* Cor do texto */
-	margin-bottom: 20px; /* Espaçamento inferior para dar mais espaço */
-	letter-spacing: 2px; /* Espaçamento entre as letras */
-	line-height: 1.2; /* Altura da linha para melhor legibilidade */
-	/* Adiciona bordas arredondadas às letras */
-	border-radius: 10px; /* Valor de border-radius para ajustar a curvatura */
-	display: inline-block; /* Para que o border-radius seja aplicado corretamente */
-	background-color: #f0f0f0; /* Cor de fundo para cobrir os espaços vazios após arredondar */
-	padding: 5px 10px; /* Adiciona algum preenchimento para espaçamento interno */
+.form-container > form hr {
+  margin: 10px 0; 
 }
 
-.label-menor {
-	font-family: "Roboto", sans-serif; /* Substitua pelo nome real da sua fonte */
-	font-size: 15px; /* Tamanho menor da fonte */
-	color: #333; /* Cor do texto para diferenciar */
-	margin-bottom: 13px; /* Espaçamento inferior menor */
-	letter-spacing: 0.5px; /* Espaçamento entre as letras */
-	line-height: 1.5; /* Altura da linha para melhor legibilidade */
-}
-
-.input-arredondado {
-	font-family: "Roboto", sans-serif; /* Substitua pelo nome real da sua fonte */
+.form-container > form input {
 	font-size: 10px; /* Tamanho da fonte do input */
 	padding: 10px; /* Espaçamento interno */
 	border: 1px solid #ddd; /* Cor da borda */
@@ -233,45 +215,223 @@ ul {
 	transition: border-color 0.3s ease; /* Adiciona uma transição suave para a cor da borda */
 }
 
-.input-arredondado:focus {
+.form-container > form input:focus {
 	border-color: #3498db; /* Cor da borda quando em foco */
 }
 
-.botao-responsivo {
-	font-family: "Roboto", sans-serif;
+.form-container > form button {
 	font-size: 9px;
 	padding: 5px 10px;
 	border: none;
 	border-radius: 8px;
 	cursor: pointer;
-	transition: background-color 0.3s ease; /* Adiciona uma transição suave para a cor de fundo */
-
-	/* Adiciona estilos padrão */
-	background-color: #3498db;
-	color: #fff;
+	transition: background-color 0.3s ease;
+	background-color: #edf2f4;
+	color: #000;
 }
 
-/* Efeito quando o mouse passa por cima */
-.botao-responsivo:hover {
+.form-container > form button:hover {
 	background-color: #2980b9; /* Nova cor de fundo ao passar o mouse */
 }
 
-.botao-responsivo-secundario {
-	font-family: "Roboto", sans-serif;
-	font-size: 9px;
-	padding: 5px 10px;
-	border: none;
-	border-radius: 8px;
-	cursor: pointer;
-	transition: background-color 0.3s ease; /* Adiciona uma transição suave para a cor de fundo */
-
-	/* Adiciona estilos padrão */
-	background-color: #f0f0f0;
-	color: #333;
+.trial-container {
+	background-color: var(--trial-background-color);
+	padding: 10px;
+	border-radius: 10px;
+  max-width: 300px;
+  width: 100%;
 }
 
-/* Efeito quando o mouse passa por cima */
-.botao-responsivo-secundario:hover {
-	background-color: #ddd; /* Nova cor de fundo ao passar o mouse */
+.trial {
+  background-color: #edf2f4;
+  margin: 10px 0;
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.trial-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.trial-header > div {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+.trial-header button {
+  font-size: 9px;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  background-color: #8d99ae;
+  color: #000;
+}
+
+.factor-trial {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.factor-trial button {
+  font-size: 9px;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  background-color: #8d99ae;
+  color: #000;
+}
+
+/* MODAL STYLES */
+.modal {
+	display: none; /* Hidden by default */
+	position: fixed; /* Stay in place */
+	z-index: 1; /* Sit on top */
+	padding-top: 100px; /* Location of the box */
+	left: 0;
+	top: 0;
+	width: 100%; /* Full width */
+	height: 100%; /* Full height */
+	overflow: auto; /* Enable scroll if needed */
+	background-color: rgb(0, 0, 0); /* Fallback color */
+	background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+/* Default styles */
+.modal-content {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 600px;
+  height: 600px;
+  border-radius: 10px;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .modal {
+      padding: 3px;
+  }
+
+  .modal-content {
+      width: 90%; /* Adjust the width for smaller screens */
+      height: 90%; /* Allow height to adjust based on content */
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.modal-body {
+  overflow-y: scroll;
+  max-height: 90%;
+  width: 100%;
+  scroll-behavior: smooth;
+}
+
+.experiment-info {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.experiment-info > span {
+  font-size: 20px;
+  margin: 3px;
+  border-radius: 10px;
+  background-color: #8d99ae;
+  color: #000;
+  min-width: 30px;
+  min-height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.exp-info-trial {
+  background-color: #e0e1dd;
+  border-radius: 10px;
+  padding: 10px;
+  margin: 10px 0;
+}
+
+.exp-info-trial > h5 {
+  margin-bottom: 5px;
+}
+
+.exp-info-trial table, .exp-info-trial td,.exp-info-trial th {  
+  border: 1px solid gray;
+  text-align: left;
+}
+
+.exp-info-trial table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.exp-info-trial th, .exp-info-trial td {
+  padding: 5px;
+}
+/* The Close Button */
+.close {
+  font-size: 2rem;
+  padding: 2px 10px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  background-color: #8d99ae;
+  color: #000;
+}
+
+.close:hover,
+.close:focus {
+  background-color: #2980b9;
+  color: #fff;
+  text-decoration: none;
+  outline: none;
+}
+
+/* Custom scroll bar */
+.modal-body::-webkit-scrollbar, .classification-experiment > ul::-webkit-scrollbar {
+  width: 10px; 
+  border-radius: 10px; 
+}
+
+/* Track (the area the scrollbar sits on) */
+.modal-body::-webkit-scrollbar-track, .classification-experiment > ul::-webkit-scrollbar-track {
+  background: #f1f1f1; 
+  border-radius: 10px; 
+}
+
+/* Handle (the draggable part of the scrollbar) */
+.modal-body::-webkit-scrollbar-thumb, .classification-experiment > ul::-webkit-scrollbar-thumb {
+  background: #888; 
+  border-radius: 10px;
+}
+
+/* Handle on hover */
+.modal-body::-webkit-scrollbar-thumb:hover, .classification-experiment > ul::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
 
