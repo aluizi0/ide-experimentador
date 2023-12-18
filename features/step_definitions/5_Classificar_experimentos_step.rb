@@ -8,13 +8,19 @@ Given("I am on the {string} page") do |string|
   visit string
 end
 
-When("I select tag with id {string}") do |string|
-  # click the select
-  find(:css, '#select-1').click
-  # click the option
+When("I click on the tag with id {string}") do |string|
   find(:css, '#' + string).click
 end
 
-Then("I should see the tag {string}") do |string|
+And("I click on the add button with id {string}") do |string|
+  find(:css, '#' + string).click
+end
+
+
+Then("I should see the message {string}") do |string|
   expect(page).to have_content(string)
+end
+
+And("I should see the tag {string} on the experiment {string}") do |string, string2|
+  expect(page).to have_css('#'+string2, text: string)
 end
