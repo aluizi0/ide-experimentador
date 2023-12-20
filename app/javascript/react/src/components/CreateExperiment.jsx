@@ -9,6 +9,12 @@ const CreateExperiment = () => {
 	const [factors, setFactors] = useState(JSON.parse(localStorage.getItem("factors")) || {});
 	const [value, setValue] = useState("");
 	const [open, setOpen] = useState(null);
+	const [viewInput, setViewInput] = useState(null);
+
+	const handleViewInput = (factor) => {
+		setViewInput(factor);
+		if (!factor) setValue("");
+	};
 
 	const handleOpen = ({ experiment, trials }) => {
 		setOpen({ experiment, trials });
@@ -17,6 +23,8 @@ const CreateExperiment = () => {
 		setOpen(null);
 	};
 	const ref = useClickAway(handleClose);
+
+	const refFactor = useClickAway(() => handleViewInput(null));
 
 	addFactor = (name) => {
 		if (name.length > 0 && !Object.keys(factors).includes(name)) {
@@ -156,18 +164,7 @@ const CreateExperiment = () => {
 						>
 							Adicionar
 						</button>
-						<p>Valor para fator</p>
-						<input
-							type="text"
-							id="factorValue"
-							placeholder="Valor do fator"
-							value={value}
-							onChange={(e) => setValue(e.target.value)}
-						/>
-						<span className="info">
-							Para adicionar o valor inserido ao fator, clique no botão 'Adicionar valor' ao lado do
-							nome do fator na seção 'Fatores'.
-						</span>
+						<hr></hr>
 						<button type="button" id="createExperiment" onClick={submitExperiment}>
 							Criar experimento
 						</button>
@@ -182,8 +179,31 @@ const CreateExperiment = () => {
 						<div key={factor} className="trial">
 							<div className="trial-header">
 								{factor}
+								<br />
 								<div>
-									<button id={`add-to-${factor}`} onClick={() => addValueToFactor(factor, value)}>Adicionar valor</button>
+									{viewInput === factor ? (
+										<div ref={refFactor} className="factor-input">
+											<input
+												type="text"
+												id={`add-value-to-${factor}`}
+												placeholder="Valor do fator"
+												value={value}
+												onChange={(e) => setValue(e.target.value)}
+											/>
+											<button
+												id={`submit-value-to-${factor}`}
+												onClick={() => addValueToFactor(factor, value)}
+											>
+												+
+											</button>
+										</div>
+									) : (
+										<>
+											<button id={`add-to-${factor}`} onClick={() => handleViewInput(factor)}>
+												Adicionar valor
+											</button>
+										</>
+									)}
 									<button onClick={() => removeFactor(factor)}>&times;</button>
 								</div>
 							</div>

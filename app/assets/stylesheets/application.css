@@ -275,6 +275,38 @@ li {
   color: #000;
 }
 
+.factor-input {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.factor-input > input {
+  font-size: 10px;
+  padding: 3px;
+  height: 20px;
+  width: 100px;
+  border: 1px solid #ddd; 
+	border-radius: 8px 0 0 8px;
+	outline: none; 
+	box-sizing: border-box;
+}
+
+.factor-input > input:focus {
+  border-color: #3498db;
+}
+
+.factor-input > button {
+  padding: 5px;
+  border: none;
+  border-radius: 0px 8px 8px 0px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  background-color: #8d99ae;
+  color: #000;
+}
+
 .factor-trial {
   display: flex;
   flex-direction: row;

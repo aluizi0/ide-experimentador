@@ -22,6 +22,10 @@ And("the user clicks on the button with id {string}") do |string|
   find(:css, '#' + string).click
 end
 
+And("the user types {string} on the factor input field {string}") do |string, string2|
+  fill_in string2, with: string
+end
+
 And("the user clicks on the create experiment button") do
   click_button 'createExperiment'
 end
@@ -38,7 +42,6 @@ end
 And("the user dont fill the fields") do
   fill_in 'experimentName', with: ''
   fill_in 'factorName', with: ''
-  fill_in 'factorValue', with: ''
 end
 
 Then("the user should see the fail message {string}") do |string|

@@ -7,14 +7,16 @@
     And the user clicks on the add factor button
     And the user clicks on the factor name field and types "Temperatura"
     And the user clicks on the add factor button
-    And the user clicks on the factor value field and types "10"
     And the user clicks on the button with id "add-to-Velocidade"
-    And the user clicks on the factor value field and types "20"
-    And the user clicks on the button with id "add-to-Velocidade"
-    And the user clicks on the factor value field and types "30"
+    And the user types "10" on the factor input field "add-value-to-Velocidade"
+    And the user clicks on the button with id "submit-value-to-Velocidade"
+    And the user types "20" on the factor input field "add-value-to-Velocidade"
+    And the user clicks on the button with id "submit-value-to-Velocidade"
     And the user clicks on the button with id "add-to-Temperatura"
-    And the user clicks on the factor value field and types "40"
-    And the user clicks on the button with id "add-to-Temperatura"
+    And the user types "30" on the factor input field "add-value-to-Temperatura"
+    And the user clicks on the button with id "submit-value-to-Temperatura"
+    And the user types "40" on the factor input field "add-value-to-Temperatura"
+    And the user clicks on the button with id "submit-value-to-Temperatura"
     And the user clicks on the create experiment button
     Then the user should see a modal with the experiment details
 
