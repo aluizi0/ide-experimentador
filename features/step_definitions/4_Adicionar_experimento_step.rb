@@ -26,6 +26,14 @@ And("the user types {string} on the factor input field {string}") do |string, st
   fill_in string2, with: string
 end
 
+And("the user clicks on the robots name field and types {string}") do |string|
+  fill_in 'robotName', with: string
+end
+
+And("the user clicks on the add robot button") do
+  click_button 'addRobot'
+end
+
 And("the user clicks on the create experiment button") do
   click_button 'createExperiment'
 end
@@ -37,6 +45,7 @@ Then('the user should see a modal with the experiment details') do
   expect(page).to have_content('Ensaio 10-40')
   expect(page).to have_content('Ensaio 20-30')
   expect(page).to have_content('Ensaio 20-40')
+  expect(page).to have_content('Robot 1')
 end
 
 And("the user dont fill the fields") do

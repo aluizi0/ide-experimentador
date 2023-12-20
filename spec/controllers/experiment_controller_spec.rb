@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe ExperimentController, type: :controller do
   context 'POST #create' do
     it 'should create an experiment' do
-      post :create, params: { experimentName: 'test', factors: { 'velocidade' => ['1', '2'], 'temperatura' => ['4', '5'] } }
+      post :create, params: { experimentName: 'test', factors: { 'velocidade' => ['1', '2'], 'temperatura' => ['4', '5'] }, robots: ['r2d2'] }
 
 
       body = JSON.parse(response.body)
@@ -21,8 +21,44 @@ RSpec.describe ExperimentController, type: :controller do
       trial_names = body['trials'].map { |trial| trial['trial']['name'] }
       expect(trial_names).to include('4-1', '4-2', '5-1', '5-2').or include('1-4', '1-5', '2-4', '2-5')
 
+      expect(body['robots'].length).to eq(1)
+      expect(body['robots'][0]['name']).to eq('r2d2')
+
       expect(response).to have_http_status(:ok)
       expect(JSON.parse(response.body)['message']).to eq('success')
+    end
+
+    it 'should create an experiment with multiple robots' do
+      post :create, params: { experimentName: 'test', factors: { 'velocidade' => ['1', '2'], 'temperatura' => ['4', '5'] }, robots: ['r2d2', 'c3po'] }
+
+      robots = JSON.parse(response.body)['robots']
+
+      expect(robots.length).to eq(2)
+      expect(robots.map { |robot| robot['name'] }).to include('r2d2', 'c3po')
+
+      expect(response).to have_http_status(:ok)
+      expect(JSON.parse(response.body)['message']).to eq('success')
+    end
+
+    it 'should not create an experiment if no robots are given' do
+      post :create, params: { experimentName: 'test', factors: { 'velocidade' => ['1', '2'], 'temperatura' => ['4', '5'] } }
+
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(JSON.parse(response.body)['error']).to eq('Invalid params')
+    end
+
+    it 'should not create an experiment if robots name is empty' do
+      post :create, params: { experimentName: 'test', factors: { 'velocidade' => ['1', '2'], 'temperatura' => ['4', '5'] }, robots: [''] }
+
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(JSON.parse(response.body)['error']).to eq('Invalid params')
+    end
+
+    it 'should not create an experiment if robots array is empty' do
+      post :create, params: { experimentName: 'test', factors: { 'velocidade' => ['1', '2'], 'temperatura' => ['4', '5'] }, robots: [] }
+
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(JSON.parse(response.body)['error']).to eq('Invalid params')
     end
 
     it 'should not create an experiment if experimentName is nil' do

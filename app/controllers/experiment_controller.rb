@@ -6,6 +6,7 @@ class ExperimentController < ApplicationController
   # Params:
   #   experimentName: string
   #   factors: { factorName: [factorValue1, factorValue2, ...], ... }
+  #   robots: [robotName1, robotName2, ...]
   # Returns:
   #   message: string
   #   experiment: { id: integer, name: string, disabled: boolean, created_at: datetime, updated_at: datetime }
@@ -19,16 +20,21 @@ class ExperimentController < ApplicationController
   #     },
   #     ...
   #   ]
+  #   robots: [
+  #     { id: integer, name: string, created_at: datetime, updated_at: datetime },
+  #     ...
+  #   ]
   #   error: string
   #   status: integer
   def create
     experiment_name = params['experimentName']
     factors = params['factors']
-    return render_unprocessable_entity("Invalid params") unless create_params_are_valid(experiment_name, factors)
+    robots = params['robots']
+    return render_unprocessable_entity("Invalid params") unless create_params_are_valid(experiment_name, factors, robots)
 
-    experiment = save_experiment(experiment_name, factors)
+    experiment = save_experiment(experiment_name, factors, robots)
 
-    render_experiment_and_trials(experiment.id)
+    render_experiment(experiment.id)
     rescue StandardError => error
       render_unprocessable_entity(error.message)
   end
@@ -122,12 +128,15 @@ class ExperimentController < ApplicationController
   #   factors: { factorName: [factorValue1, factorValue2, ...], ... }
   # Returns:
   #   boolean
-  def create_params_are_valid(experiment_name, factors)
+  def create_params_are_valid(experiment_name, factors, robots)
      factors&.is_a?(ActionController::Parameters) \
       && factors.values.all? { |value| value.is_a?(Array) && value.length >= 1 } \
       && factors.keys.all? { |key| key.is_a?(String) } \
       && experiment_name.is_a?(String) \
-      && experiment_name.length >= 1
+      && experiment_name.length >= 1 \
+      && robots&.class == Array \
+      && robots.length >= 1 \
+      && robots.all? { |robot| robot.is_a?(String) && robot.length >= 1 }
   end
 
   def render_not_found(message)
@@ -144,11 +153,13 @@ class ExperimentController < ApplicationController
   #   factors: { factorName: [factorValue1, factorValue2, ...], ... }
   # Returns:
   #   experiment: { id: integer, name: string, disabled: boolean, created_at: datetime, updated_at: datetime }
-  def save_experiment(experiment_name, factors)
+  def save_experiment(experiment_name, factors, robots)
     experiment = Experiment.create(name: experiment_name, disabled: false)
     save_factors(factors)
     values = factors.values
     save_combinations(experiment.id, factors.keys, values[0].product(*values[1..-1]))
+    save_robots(robots)
+    save_experiment_robots(experiment.id, robots)
     return experiment
   end
 
@@ -205,13 +216,12 @@ class ExperimentController < ApplicationController
   end
 
 
-  def render_experiment_and_trials(experiment_id)
-    experiment = Experiment.find(experiment_id)
-    trials = get_trials(experiment_id)
+  def render_experiment(experiment_id)
     render json: {
       message: 'success',
-      experiment: experiment,
-      trials: trials
+      experiment: Experiment.find(experiment_id),
+      trials: get_trials(experiment_id),
+      robots: get_experiment_robots(experiment_id)
     }, status: :ok
   end
 
@@ -225,6 +235,27 @@ class ExperimentController < ApplicationController
   def get_factors(trial_id)
     trial_factors = TrialFactor.where(trial_id: trial_id)
     trial_factors.map { |trial_factor| Factor.find(trial_factor.factor_id) }
+  end
+
+  def save_robots(robots)
+    robots.each do |robot|
+      if Robot.where(name: robot).empty?
+        Robot.create(name: robot)
+      end
+    end
+  end
+
+  def save_experiment_robots(experiment_id, robots)
+    robots.each do |robot|
+      robot_id = Robot.where(name: robot).first.id
+      if ExperimentsRobot.where(experiment_id: experiment_id, robot_id: robot_id).empty?
+        ExperimentsRobot.create(experiment_id: experiment_id, robot_id: robot_id)
+      end
+    end
+  end
+
+  def get_experiment_robots(experiment_id)
+    ExperimentsRobot.where(experiment_id: experiment_id).map { |experiment_robot| Robot.find(experiment_robot.robot_id) }
   end
 
 end

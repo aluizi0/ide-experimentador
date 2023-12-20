@@ -325,6 +325,65 @@ li {
   color: #000;
 }
 
+.robots-container {
+  background-color: var(--trial-background-color);
+	padding: 10px;
+	border-radius: 10px;
+  max-width: 300px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.robots-container > input {
+	font-size: 10px; /* Tamanho da fonte do input */
+	padding: 10px; /* Espaçamento interno */
+	border: 1px solid #ddd; /* Cor da borda */
+	border-radius: 8px; /* Cantos arredondados */
+	outline: none; /* Remover a borda de foco padrão */
+	box-sizing: border-box; /* Incluir padding e border na largura e altura */
+	transition: border-color 0.3s ease; /* Adiciona uma transição suave para a cor da borda */
+}
+
+.robots-container > input:focus {
+  border-color: #3498db;
+}
+
+.robots-container > button {
+  font-size: 9px;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  background-color: #edf2f4;
+  color: #000;
+}
+
+.robot {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #edf2f4;
+  padding: 10px;
+  border-radius: 10px;
+
+}
+
+.robot > button {
+  font-size: 9px;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  background-color: #8d99ae;
+  color: #000;
+}
+
+
 /* MODAL STYLES */
 .modal {
 	display: none; /* Hidden by default */
@@ -378,6 +437,30 @@ li {
   max-height: 90%;
   width: 100%;
   scroll-behavior: smooth;
+}
+
+.exp-info-robot {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #e0e1dd;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 10px;
+}
+
+.exp-info-robot > span {
+  font-size: 20px;
+  margin: 3px;
+  border-radius: 10px;
+  background-color: #8d99ae;
+  color: #000;
+  min-width: 30px;
+  min-height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .experiment-info {

@@ -17,6 +17,8 @@
     And the user clicks on the button with id "submit-value-to-Temperatura"
     And the user types "40" on the factor input field "add-value-to-Temperatura"
     And the user clicks on the button with id "submit-value-to-Temperatura"
+    And the user clicks on the robots name field and types "Robot 1"
+    And the user clicks on the add robot button
     And the user clicks on the create experiment button
     Then the user should see a modal with the experiment details
 

@@ -10,14 +10,15 @@ const CreateExperiment = () => {
 	const [value, setValue] = useState("");
 	const [open, setOpen] = useState(null);
 	const [viewInput, setViewInput] = useState(null);
+	const [robots, setRobots] = useState(JSON.parse(localStorage.getItem("robots")) || []);
 
 	const handleViewInput = (factor) => {
 		setViewInput(factor);
 		if (!factor) setValue("");
 	};
 
-	const handleOpen = ({ experiment, trials }) => {
-		setOpen({ experiment, trials });
+	const handleOpen = ({ experiment, trials, robots }) => {
+		setOpen({ experiment, trials, robots });
 	};
 	const handleClose = () => {
 		setOpen(null);
@@ -25,6 +26,17 @@ const CreateExperiment = () => {
 	const ref = useClickAway(handleClose);
 
 	const refFactor = useClickAway(() => handleViewInput(null));
+
+	const addRobot = (name) => {
+		if (name.length > 0 && !robots.includes(name)) {
+			setRobots([...robots, name]);
+		}
+	};
+
+	const removeRobot = (name) => {
+		const newRobots = robots.filter((robot) => robot !== name);
+		setRobots(newRobots);
+	};
 
 	addFactor = (name) => {
 		if (name.length > 0 && !Object.keys(factors).includes(name)) {
@@ -55,7 +67,7 @@ const CreateExperiment = () => {
 	};
 
 	submitExperiment = () => {
-		const data = { experimentName, factors };
+		const data = { experimentName, factors, robots };
 
 		// post /experiments
 		fetch("/experiment/create", {
@@ -93,13 +105,15 @@ const CreateExperiment = () => {
 	clearExperiment = () => {
 		setExperimentName("");
 		setFactors({});
+		setRobots([]);
 	};
 
 	// Cache values in local storage so they are not lost on page refresh
 	useEffect(() => {
 		localStorage.setItem("experimentName", experimentName);
 		localStorage.setItem("factors", JSON.stringify(factors));
-	}, [experimentName, factors]);
+		localStorage.setItem("robots", JSON.stringify(robots));
+	}, [experimentName, factors, robots]);
 
 	return (
 		<>
@@ -116,6 +130,15 @@ const CreateExperiment = () => {
 						<div className="experiment-info">
 							<p>{open?.experiment?.name}</p>
 							<span>{open?.experiment?.id}</span>
+						</div>
+						<div>
+							<h3>Robôs</h3>
+							{open?.robots?.map((robot) => (
+								<div className="exp-info-robot" key={robot.id}>
+										<p>{robot.name}</p>
+										<span>{robot.id}</span>
+								</div>
+							))}
 						</div>
 						<h3>Ensaios</h3>
 						{open?.trials?.map((trial) => (
@@ -215,6 +238,23 @@ const CreateExperiment = () => {
 									</button>
 								</div>
 							))}
+						</div>
+					))}
+				</div>
+				<div className="robots-container">
+					<h1>Robôs</h1>
+					<input type="text" id="robotName" placeholder="Nome do robô" />
+					<button
+						id="addRobot"
+						type="button"
+						onClick={() => addRobot(document.getElementById("robotName").value)}
+					>
+						Adicionar
+					</button>
+					{robots.map((robot) => (
+						<div key={robot} className="robot">
+							{robot}
+							<button onClick={() => removeRobot(robot)}>&times;</button>
 						</div>
 					))}
 				</div>
